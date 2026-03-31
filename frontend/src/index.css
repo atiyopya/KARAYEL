@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  --primary: #0f172a;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.5);
+  --bg-dark: #020617;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme {
+  --primary: #f8fafc;
+  --accent: #2563eb;
+  --accent-glow: rgba(37, 99, 235, 0.3);
+  --bg-dark: #f1f5f9;
+  --glass: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Hide number input spinners globally */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  padding: 2rem;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

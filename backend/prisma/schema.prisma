@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+  products  Product[]
+  orders    Order[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstname String?
+  lastname  String?
+  role      Role     @default(CUSTOMER)
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  basePrice   Decimal   @db.Decimal(10, 2)
+  imageUrl    String?   // Template image for mockup
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  variants    Variant[]
+  createdAt   DateTime  @default(now())
+}
+
+model Variant {
+  id        String   @id @default(cuid())
+  colorName String
+  colorCode String?  // Hex code
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  mockups   Mockup[]
+}
+
+model Mockup {
+  id           String   @id @default(cuid())
+  name         String?
+  logoUrl      String
+  logoSettings Json     // { x, y, scale, rotation }
+  variantId    String
+  variant      Variant  @relation(fields: [variantId], references: [id])
+  orders       Order[]
+  createdAt    DateTime @default(now())
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  status        OrderStatus @default(PENDING)
+  source        OrderSource @default(WEB)
+  totalAmount   Decimal     @db.Decimal(10, 2)
+  tenantId      String
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  customerId    String
+  customer      User        @relation(fields: [customerId], references: [id])
+  mockupId      String
+  mockup        Mockup      @relation(fields: [mockupId], references: [id])
+  items         OrderItem[]
+  paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod String?     // Cash, Bank Transfer, Online
+  createdAt     DateTime    @default(now())
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  size     String // S, M, L, XL, etc.
+  quantity Int
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  IN_PRODUCTION
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderSource {
+  WEB
+  WHATSAPP
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}

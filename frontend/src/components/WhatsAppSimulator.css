@@ -1,0 +1,68 @@
+.whatsapp-simulator {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+
+.whatsapp-simulator {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.whatsapp-simulator .header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #25d366; /* WhatsApp Green */
+}
+
+.whatsapp-simulator h4 {
+  margin: 0;
+}
+
+.whatsapp-simulator .hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.whatsapp-simulator textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: white;
+  padding: 1rem;
+  resize: none;
+}
+
+.whatsapp-simulator button {
+  width: 100%;
+}
+
+.parsed-feedback {
+  background: rgba(37, 211, 102, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(37, 211, 102, 0.2);
+}
+
+.parsed-feedback h5 {
+  margin-bottom: 0.5rem;
+  color: #25d366;
+}
+
+.size-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.size-tag {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}

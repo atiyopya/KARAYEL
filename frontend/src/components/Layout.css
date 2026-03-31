@@ -1,0 +1,41 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.blob-bg {
+  position: fixed;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.blob-1 {
+  width: 600px;
+  height: 600px;
+  background: var(--accent);
+  filter: blur(140px);
+  opacity: 0.08;
+  top: -100px;
+  right: 0;
+}
+
+.blob-2 {
+  width: 500px;
+  height: 500px;
+  background: #7c3aed;
+  filter: blur(140px);
+  opacity: 0.06;
+  bottom: 0;
+  left: 100px;
+}

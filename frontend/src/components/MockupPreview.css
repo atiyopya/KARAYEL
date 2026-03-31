@@ -1,0 +1,126 @@
+.mockup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.mockup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-info h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.product-info p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.color-selector {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.color-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.color-circle.active {
+  border-color: white;
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.preview-area.asset-preview {
+  position: relative;
+  background: #111;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+}
+
+.tshirt-display {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+}
+
+.asset-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Logo Overlays on Real Product Photos */
+.logo-overlay {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  mix-blend-mode: multiply; /* Blends logo with fabric texture */
+}
+
+.logo-overlay img {
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+}
+
+/* Front Chest (Left Figure in the composite) */
+.asset-front-logo {
+  top: 35%;
+  left: 28%; /* Move slightly right to center on chest */
+  width: 10%; /* Increase slightly for visibility */
+  transform: translate(-50%, -50%);
+}
+
+/* Back Center (Right Figure in the composite) */
+.asset-back-logo {
+  top: 38%; /* Move higher up on the back */
+  left: 77%; /* Better center on the right figure */
+  width: 18%; /* Moderate size */
+  transform: translate(-50%, -50%);
+}
+
+.mockup-footer {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-secondary {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  transition: var(--transition);
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent);
+}
+
+.btn-deactive {
+  background: rgba(255, 255, 255, 0.05);
+  color: #555;
+  border: 1px solid transparent;
+  cursor: not-allowed;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
