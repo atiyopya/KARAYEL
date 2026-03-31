@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CreditCard, ArrowLeft, CheckCircle, PackageCheck, SendToBack } from 'lucide-react';
+import { CreditCard, ArrowLeft, CheckCircle, PackageCheck, Copy, CheckCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+// Geçici IBAN - daha sonra değiştirilecek
+const COMPANY_IBAN = 'TR76 0001 0017 4538 7752 9650 01';
+const COMPANY_NAME = 'KAREYEL İŞ ELBİSELERİ TIC. LTD. ŞTİ.';
+const COMPANY_BANK = 'Ziraat Bankası';
 
 const PaymentScreen = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [ibanCopied, setIbanCopied] = useState(false);
 
   // Fallback if navigated without state
   const { quantities = {}, total = 0, productName = 'Ürün', productPrice = 0 } = location.state || {};
@@ -23,7 +30,19 @@ const PaymentScreen = () => {
     );
   }
 
+  const handleCopyIban = () => {
+    navigator.clipboard.writeText(COMPANY_IBAN.replace(/\s/g, ''));
+    setIbanCopied(true);
+    toast.success('IBAN kopyalandı!');
+    setTimeout(() => setIbanCopied(false), 3000);
+  };
+
   const handlePayment = async () => {
+    // Telefon zorunlu kontrolü
+    if (!customerPhone || customerPhone.length < 10) {
+      toast.error('📱 Lütfen geçerli bir WhatsApp telefon numarası girin!');
+      return;
+    }
     setLoading(true);
     // 1. Simüle edilmiş ödeme süreci
     toast.promise(
@@ -42,6 +61,7 @@ const PaymentScreen = () => {
         
         const orderData = {
           customerName: user.name || "Müşteri",
+          customerPhone: customerPhone || null,
           status: 'PENDING',
           items: Object.entries(quantities)
             .filter(([_, qty]) => qty > 0)
@@ -122,6 +142,41 @@ const PaymentScreen = () => {
               ))}
             </div>
 
+            {/* Phone Number Input - ZORUNLU */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                📱 WhatsApp Telefon Numarası <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>+90</span>
+                <input
+                  type="tel"
+                  placeholder="5XX XXX XX XX"
+                  value={customerPhone}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setCustomerPhone(val.startsWith('0') ? val.slice(1) : val);
+                  }}
+                  maxLength={10}
+                  style={{
+                    width: '100%',
+                    paddingLeft: '3.5rem',
+                    padding: '0.85rem 1rem 0.85rem 3.5rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${customerPhone.length === 10 ? '#10b981' : customerPhone.length > 0 ? '#fbbf24' : 'var(--glass-border)'}`,
+                    borderRadius: '10px',
+                    color: 'var(--text-main)',
+                    fontSize: '1rem',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                />
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#fbbf24', marginTop: '0.4rem' }}>
+                ⚠️ Sipariş bildirimleri bu numaraya WhatsApp ile gönderilecektir.
+              </p>
+            </div>
+
             <div className="summary-row total-row">
               <span>Ödenecek Tutar:</span>
               <span className="gradient-text" style={{ fontSize: '1.5rem' }}>{grandTotal.toLocaleString()} ₺</span>
@@ -177,6 +232,70 @@ const PaymentScreen = () => {
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Dekont onayı gerekir</span>
               </div>
             </label>
+
+            {/* IBAN - Havale seçildiğinde görünsün */}
+            {paymentMethod === 'transfer' && (
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '12px',
+                padding: '1.25rem',
+              }}>
+                <p style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Havale / EFT Bilgileri
+                </p>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Banka</span>
+                  <p style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem' }}>{COMPANY_BANK}</p>
+                </div>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Hesap Sahibi</span>
+                  <p style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem' }}>{COMPANY_NAME}</p>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.3rem' }}>IBAN</span>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'rgba(0,0,0,0.2)',
+                    borderRadius: '8px',
+                    padding: '0.75rem 1rem',
+                    border: '1px solid rgba(16, 185, 129, 0.2)'
+                  }}>
+                    <span style={{ fontFamily: 'monospace', fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '1px' }}>
+                      {COMPANY_IBAN}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyIban}
+                      title="IBAN'\u0131 Kopyala"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: ibanCopied ? '#10b981' : 'var(--text-muted)',
+                        padding: '0.25rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        transition: 'color 0.2s'
+                      }}
+                    >
+                      {ibanCopied ? <CheckCheck size={18} /> : <Copy size={18} />}
+                    </button>
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Açıklama:</span>
+                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Boş bırakınız</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Kişi:</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <button 

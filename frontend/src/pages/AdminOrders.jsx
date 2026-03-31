@@ -27,6 +27,7 @@ const INITIAL_ORDERS = [
     product: 'Mavi Polar', color: 'Mavi',
     items: [{ size: 'XL', quantity: 5 }, { size: 'L', quantity: 3 }, { size: 'M', quantity: 2 }],
     totalAmount: '2500.00', paymentStatus: 'UNPAID', createdAt: '2026-03-31T08:00:00Z',
+    customerPhone: '+905551234567',
   },
   {
     id: 'ORD-002', orderNumber: 'ORD-002', status: 'IN_PRODUCTION', source: 'WEB',
@@ -34,6 +35,7 @@ const INITIAL_ORDERS = [
     product: 'Siyah Polar', color: 'Siyah',
     items: [{ size: 'XXL', quantity: 10 }, { size: 'XL', quantity: 8 }],
     totalAmount: '5400.00', paymentStatus: 'PAID', createdAt: '2026-03-30T14:00:00Z',
+    customerPhone: '',
   },
 ];
 
@@ -59,17 +61,42 @@ const AdminOrders = () => {
     return matchesSource && matchesStatus && matchesSearch;
   });
 
-  const handleStatusChange = (orderId, newStatus) => {
-    let confirmMessage = newStatus === 'IN_PRODUCTION' 
-      ? "Bu siparişi Üretime Göndermek istediğinize emin misiniz? (1/2)" 
-      : "Bu siparişi Tamamlandı olarak işaretlemek istediğinize emin misiniz? (1/2)";
+  const handleStatusChange = async (orderId, newStatus) => {
+    const order = orders.find(o => o.id === orderId);
+    const confirmMsg = newStatus === 'IN_PRODUCTION' 
+      ? `Bu siparişi Üretime Göndermek istediğinize emin misiniz? (1/2)` 
+      : `Bu siparişi Tamamlandı olarak işaretlemek istediğinize emin misiniz? (1/2)`;
       
-    if (window.confirm(confirmMessage)) {
-      if (window.confirm("Bu işlem geri alınamaz. Onaylıyor musunuz? (2/2)")) {
-        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-        toast.success(`${orderId} durumu başarıyla güncellendi.`);
-        setSelectedOrder(null);
+    if (!window.confirm(confirmMsg)) return;
+    if (!window.confirm('Bu işlem geri alınamaz. Onaylıyor musunuz? (2/2)')) return;
+    
+    // Update local state immediately
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
+    toast.success(`${orderId} durumu başarıyla güncellendi.`);
+
+    // Fire WhatsApp notification via backend
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          orderNumber: order?.orderNumber,
+          customerName: `${order?.customer?.firstname} ${order?.customer?.lastname}`,
+          customerPhone: order?.customerPhone || null,
+        })
+      });
+      
+      if (order?.customerPhone) {
+        toast.success('📱 WhatsApp bildirimi gönderildi!');
       }
+    } catch (err) {
+      console.error('WhatsApp notification failed:', err);
     }
   };
 
@@ -197,6 +224,11 @@ const AdminOrders = () => {
                 <div className="detail-item">
                   <span className="label">Müşteri</span>
                   <span className="value">{selectedOrder.customer.firstname} {selectedOrder.customer.lastname}</span>
+                </div>
+
+                <div className="detail-item">
+                  <span className="label">📱 WhatsApp</span>
+                  <span className="value" style={{ fontSize: '0.9rem' }}>{selectedOrder.customerPhone || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Belirtilmemiş</span>}</span>
                 </div>
                 
                 <div className="size-distribution">
